@@ -1,0 +1,2171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070e22">
+  <meta name="description" content="WeatherGuard AI – Advanced Extreme Weather Detection, Anomaly Scoring, and Geographic Storm Movement Tracking System powered by Open-Meteo and Machine Learning.">
+  <title>WeatherGuard AI – Extreme Weather Detection & Tracking System</title>
+  
+  <!-- Modern Typography: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet & Chart.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    
+    <!-- Collapsible Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M22 3L38 12V32L22 41L6 32V12L22 3Z" stroke="url(#cyan-grad)" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M11 24H18L21 15L25 29L28 21H33" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="22" cy="22" r="3" fill="#00e5ff" fill-opacity="0.8"/>
+            <defs>
+              <linearGradient id="cyan-grad" x1="6" y1="3" x2="38" y2="41" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00e5ff"/>
+                <stop offset="1" stop-color="#0066ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <strong>WEATHERGUARD<span class="brand-ai">AI</span></strong>
+          <small>EXTREME WEATHER INTELLIGENCE</small>
+        </div>
+      </div>
+
+      <div class="nav-section-label">MONITORING CONSOLE</div>
+      
+      <nav class="sidebar-nav" aria-label="Main Navigation">
+        <a class="nav-item active" href="#dashboard" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" href="weather.html" data-view="map">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <span>Live Weather Map</span>
+          <span class="live-beacon-chip">MAP</span>
+        </a>
+        <a class="nav-item" href="#detection" data-view="detection">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>AI Anomaly Detection</span>
+        </a>
+        <a class="nav-item" href="#tracking" data-view="tracking">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Event Tracking</span>
+          <span class="badge-count" id="nav-event-count">0</span>
+        </a>
+        <a class="nav-item" href="#forecast" data-view="forecast">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          <span>Forecast & Trends</span>
+        </a>
+        <a class="nav-item" href="#history" data-view="history">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Historical Analysis</span>
+        </a>
+        <a class="nav-item" href="#alerts" data-view="alerts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Alerts & Safety</span>
+          <span class="badge-alert" id="nav-alert-count">0</span>
+        </a>
+        <a class="nav-item" href="#about" data-view="about">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>About / Docs</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="connection-status-card">
+          <span class="status-pulse-dot" id="data-pulse-dot"></span>
+          <div class="status-text">
+            <strong id="connection-state">Open-Meteo Connected</strong>
+            <small id="connection-detail">Live Global Observations · UTC</small>
+          </div>
+        </div>
+        <div class="sidebar-disclaimer">
+          AI SCREENING ADVISORY<br>
+          <span>Not an official government warning. Follow national emergency services.</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Stage -->
+    <main class="main-content">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle navigation">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
+        <div class="breadcrumbs">
+          <span class="crumb-root">WEATHERGUARD</span>
+          <span class="crumb-separator">/</span>
+          <strong class="crumb-current" id="page-title">Dashboard</strong>
+        </div>
+
+        <!-- Global Search Bar in Topbar -->
+        <div class="topbar-search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="topbar-search-input" placeholder="Search any city worldwide (e.g. Tokyo, Miami, Chennai)..." autocomplete="off">
+          <div class="search-suggestions-dropdown" id="topbar-suggestions"></div>
+        </div>
+
+        <!-- Location Preset Dropdown -->
+        <div class="preset-selector-wrap">
+          <label for="location-preset-select" class="sr-only">Preset Location</label>
+          <select id="location-preset-select" title="Quick Location Hotspots">
+            <option value="">⚡ Weather Hotspots...</option>
+            <option value="chennai">Chennai (Bay of Bengal Cyclone Basin)</option>
+            <option value="miami">Miami, FL (Hurricane Alley)</option>
+            <option value="tokyo">Tokyo (Typhoon Zone)</option>
+            <option value="oklahoma">Oklahoma City (Severe Storm/Tornado Belt)</option>
+            <option value="london">London (North Atlantic Maritime)</option>
+            <option value="sydney">Sydney (Southern Ocean Front)</option>
+            <option value="reykjavik">Reykjavik (Arctic Gale / Subpolar Low)</option>
+          </select>
+        </div>
+
+        <div class="topbar-right">
+          <div class="utc-clock-badge">
+            <span class="clock-label">UTC</span>
+            <span class="clock-time" id="clock">--:--:--</span>
+          </div>
+
+          <button class="topbar-btn" id="refresh-all" title="Refresh Current Conditions">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Sync</span>
+          </button>
+
+          <button class="topbar-btn seed-btn" id="seed-sample-btn" title="Load Verified Cyclone & Heatwave Benchmark Test Cases">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Load Sample Storms</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Views Container -->
+      <div class="views-stage">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: MAIN DASHBOARD -->
+        <!-- ========================================== -->
+        <section class="view active" id="view-dashboard">
+          
+          <div class="dashboard-header-banner">
+            <div class="banner-text">
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>REAL-TIME METEOROLOGICAL INTELLIGENCE</span>
+              </div>
+              <h1>WeatherGuard AI Operations Desk<span class="cyan-dot">.</span></h1>
+              <p>Continuous AI-driven anomaly screening, extreme event detection, and multi-sensor atmospheric tracking.</p>
+            </div>
+            <div class="banner-meta">
+              <span class="meta-label">LAST OBSERVATION SYNC</span>
+              <strong id="last-updated">Connecting to Open-Meteo...</strong>
+              <span class="meta-coords" id="current-coords-pill">Lat: -- · Lon: --</span>
+            </div>
+          </div>
+
+          <!-- Highlight Banner: Most Significant Active Threat -->
+          <div class="threat-spotlight-card" id="threat-spotlight-card">
+            <div class="threat-icon-box" id="threat-icon-box">
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="threat-info">
+              <div class="threat-meta">
+                <span class="threat-badge" id="threat-badge">MONITORING</span>
+                <span class="threat-category" id="threat-category">Analyzing Local Atmosphere</span>
+                <span class="threat-location" id="threat-location">--</span>
+              </div>
+              <h2 id="threat-headline">Scanning regional forecast & observation baseline...</h2>
+              <p id="threat-details">Run an AI anomaly screening or inspect tracked storm trajectories below.</p>
+            </div>
+            <div class="threat-actions">
+              <div class="threat-score-pill">
+                <span>ANOMALY SCORE</span>
+                <strong id="threat-score-val">--%</strong>
+              </div>
+              <button class="threat-jump-btn" id="threat-jump-btn" data-open-view="map">
+                View on Map ↗
+              </button>
+            </div>
+          </div>
+
+          <!-- Top 4 Primary KPI Metric Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-head">
+                <span>ACTIVE ANOMALIES</span>
+                <span class="kpi-icon-wrap cyan">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+              </div>
+              <div class="kpi-value" id="metric-total">0</div>
+              <div class="kpi-sub">Total anomaly records registered</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-head">
+                <span>CRITICAL / SEVERE EVENTS</span>
+                <span class="kpi-icon-wrap red">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </span>
+              </div>
+              <div class="kpi-value" id="metric-severe">0</div>
+              <div class="kpi-sub">Crossed extreme hazard threshold</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-head">
+                <span>MODERATE / HIGH WATCH</span>
+                <span class="kpi-icon-wrap amber">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+              </div>
+              <div class="kpi-value" id="metric-active">0</div>
+              <div class="kpi-sub">Elevated departure from baseline</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-head">
+                <span>LAST 24 HOURS</span>
+                <span class="kpi-icon-wrap green">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+              </div>
+              <div class="kpi-value" id="metric-day">0</div>
+              <div class="kpi-sub">Fresh observations analyzed</div>
+            </div>
+          </div>
+
+          <!-- Main Dashboard Split Grid -->
+          <div class="dash-grid">
+            
+            <!-- Local Weather Panel -->
+            <div class="dash-card weather-panel">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">OBSERVED CONDITIONS</span>
+                  <h2>Current Weather Readings</h2>
+                </div>
+                <button class="glass-pill-btn" data-open-view="detection">Run AI Analysis ↗</button>
+              </div>
+
+              <div class="location-current-row">
+                <div class="loc-pin-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div class="loc-details">
+                  <strong id="current-place">London, United Kingdom</strong>
+                  <small id="current-coords">51.5072° N · 0.1276° W</small>
+                </div>
+                <span class="provider-badge">OPEN-METEO API</span>
+              </div>
+
+              <div class="temp-display-wrap">
+                <span class="temp-big" id="current-temp">--°</span>
+                <div class="temp-right-meta">
+                  <strong class="condition-title" id="current-condition">Fetching weather data...</strong>
+                  <small class="feels-like-text" id="current-feels">Updated just now</small>
+                </div>
+              </div>
+
+              <!-- 4 Weather Parameters -->
+              <div class="weather-metrics-grid">
+                <div class="wx-metric-item">
+                  <div class="wx-label">RAINFALL & PROB</div>
+                  <strong class="wx-val" id="current-rain">-- mm</strong>
+                  <span class="wx-sub" id="current-rain-prob">Prob: --%</span>
+                </div>
+                <div class="wx-metric-item">
+                  <div class="wx-label">WIND & GUSTS</div>
+                  <strong class="wx-val" id="current-wind">-- km/h</strong>
+                  <span class="wx-sub" id="current-wind-dir">Dir: --</span>
+                </div>
+                <div class="wx-metric-item">
+                  <div class="wx-label">BAROMETRIC PRESSURE</div>
+                  <strong class="wx-val" id="current-pressure">-- hPa</strong>
+                  <span class="wx-sub" id="current-pressure-tendency">Tendency: Normal</span>
+                </div>
+                <div class="wx-metric-item">
+                  <div class="wx-label">HUMIDITY & DEWPOINT</div>
+                  <strong class="wx-val" id="current-humidity">-- %</strong>
+                  <span class="wx-sub" id="current-dewpoint">Dew: --°C</span>
+                </div>
+              </div>
+
+              <!-- Upcoming Forecast Mini-Strip -->
+              <div class="mini-forecast-strip">
+                <div class="mini-strip-header">
+                  <span>UPCOMING 12-HOUR MODEL PROJECTION</span>
+                  <small>Open-Meteo Model Forecast</small>
+                </div>
+                <div class="mini-forecast-hours" id="forecast-hours">
+                  <span class="loading-text">Loading upcoming forecast...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 24-Hour Trends Chart Panel -->
+            <div class="dash-card chart-panel">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">ATMOSPHERIC PROFILE</span>
+                  <h2>24-Hour Observation & Forecast Curve</h2>
+                </div>
+                <div class="chart-selector-tabs">
+                  <button class="chart-tab active" data-dash-chart="temp">Temp</button>
+                  <button class="chart-tab" data-dash-chart="wind">Wind</button>
+                  <button class="chart-tab" data-dash-chart="pressure">Pressure</button>
+                  <button class="chart-tab" data-dash-chart="rain">Rain</button>
+                </div>
+              </div>
+              <div class="dash-chart-container">
+                <canvas id="overview-chart" aria-label="Weather trend chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Map Mini-Preview Card -->
+            <div class="dash-card map-preview-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">GEOSPATIAL SITUATION</span>
+                  <h2>Global Anomaly & Storm Overview</h2>
+                </div>
+                <button class="glass-pill-btn" data-open-view="map">Expand Full Map ↗</button>
+              </div>
+              <div class="mini-map-box" id="map-preview"></div>
+              <div class="map-legend-row">
+                <span class="legend-item"><i class="legend-bullet watch"></i> Watch (Score ≥ 0.60)</span>
+                <span class="legend-item"><i class="legend-bullet warning"></i> Warning (Score ≥ 0.75)</span>
+                <span class="legend-item"><i class="legend-bullet severe"></i> Critical / Severe (Score ≥ 0.88)</span>
+                <span class="legend-item"><i class="legend-bullet track"></i> Track Vector</span>
+              </div>
+            </div>
+
+            <!-- Recent Anomaly Alerts Card -->
+            <div class="dash-card alerts-feed-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">DETECTION LOG</span>
+                  <h2>Recent Extreme Weather Alerts</h2>
+                </div>
+                <button class="glass-pill-btn" data-open-view="alerts">Alert Center ↗</button>
+              </div>
+              <div class="recent-alerts-list" id="recent-alerts">
+                <div class="empty-state-box">
+                  <p>No anomalies detected yet. Use "Run AI Analysis" or "Load Sample Storms" to populate events.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Footer Information -->
+          <footer class="desk-footer">
+            <span>DATA SOURCE: <strong>Open-Meteo Weather APIs</strong> (Forecast, Historical Archive, Geocoding) · No API Key Required</span>
+            <span>TIMESTAMPS: <strong>UTC / ISO 8601</strong> · Machine Learning: <strong>Scikit-Learn Isolation Forest</strong></span>
+          </footer>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: LIVE WEATHER MAP & MOVEMENT TRACKING -->
+        <!-- ========================================== -->
+        <section class="view" id="view-map">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>GEOSPATIAL MOVEMENT & RADAR TRACKING</span>
+              </div>
+              <h1>Live Extreme Weather Map<span class="cyan-dot">.</span></h1>
+              <p>Explore detected anomalies, storm paths, and historical breadcrumbs with real-time movement vectors.</p>
+            </div>
+            
+            <div class="map-view-actions">
+              <button class="primary-cyan-btn" id="map-add-benchmark">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Load Cyclone Amphan Track</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Map Filter Toolbar -->
+          <div class="map-toolbar">
+            <form id="map-search-form" class="map-search-form">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="map-search" placeholder="Jump map to city or coordinates (e.g. 19.8, 89.2)...">
+              <button type="submit">Locate</button>
+            </form>
+
+            <div class="filter-group">
+              <label for="filter-category">CATEGORY</label>
+              <select id="filter-category">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-severity">SEVERITY</label>
+              <select id="filter-severity">
+                <option value="">All Severities</option>
+                <option value="Severe">Critical / Severe</option>
+                <option value="Warning">Warning</option>
+                <option value="Watch">Watch</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-period">TIMEFRAME</label>
+              <select id="filter-period">
+                <option value="all">All Available Records</option>
+                <option value="24">Last 24 Hours</option>
+                <option value="72">Last 72 Hours</option>
+              </select>
+            </div>
+
+            <button class="icon-refresh-btn" id="map-refresh" title="Refresh Map Markers">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </button>
+          </div>
+
+          <!-- Interactive Timeline Slider Bar -->
+          <div class="map-timeline-panel" id="map-timeline-panel">
+            <div class="timeline-controls-row">
+              <div class="timeline-playback-btns">
+                <button class="timeline-btn" id="timeline-prev-btn" title="Step Back 1 Hour">⏮</button>
+                <button class="timeline-btn play-btn" id="timeline-play-btn" title="Play / Pause Timeline Animation">▶ Play</button>
+                <button class="timeline-btn" id="timeline-next-btn" title="Step Forward 1 Hour">⏭</button>
+              </div>
+
+              <div class="timeline-slider-wrap">
+                <input type="range" id="map-timeline-slider" min="0" max="24" value="24" step="1">
+                <div class="timeline-tick-labels">
+                  <span>-24h (Past Observations)</span>
+                  <span>-12h</span>
+                  <span>-6h</span>
+                  <span class="active-tick">Current (0h)</span>
+                  <span>+12h (Forecast)</span>
+                  <span>+24h</span>
+                </div>
+              </div>
+
+              <div class="timeline-readout">
+                <span class="readout-label">SCRUBBED TIMESTAMP</span>
+                <strong class="readout-time" id="map-timeline-time">Current Observations (0h)</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Map Stage with Inspector Sidebar -->
+          <div class="map-stage-wrapper">
+            <div id="full-map" class="interactive-full-map"></div>
+
+            <aside class="map-inspector-pane">
+              <div class="inspector-header">
+                <div>
+                  <span class="dash-card-kicker">MONITORED TARGETS</span>
+                  <h3 id="map-event-count">0 Recorded Events</h3>
+                </div>
+              </div>
+
+              <div class="inspector-event-list" id="map-event-list">
+                <div class="empty-state-box">
+                  <p>No active anomalies plotted. Adjust filters or analyze a new location.</p>
+                </div>
+              </div>
+
+              <div class="map-legend-box">
+                <h4>MAP SYMBOLOGY KEY</h4>
+                <div class="legend-symbol-row">
+                  <span class="symbol-dot dot-critical"></span>
+                  <div>
+                    <strong>Critical / Severe Anomaly</strong>
+                    <small>Score ≥ 0.88 · Deep storm, gale or extreme heat</small>
+                  </div>
+                </div>
+                <div class="legend-symbol-row">
+                  <span class="symbol-dot dot-warning"></span>
+                  <div>
+                    <strong>High Warning</strong>
+                    <small>Score ≥ 0.75 · Significant hazard departure</small>
+                  </div>
+                </div>
+                <div class="legend-symbol-row">
+                  <span class="symbol-dot dot-watch"></span>
+                  <div>
+                    <strong>Moderate Watch</strong>
+                    <small>Score ≥ 0.60 · Notable meteorological departure</small>
+                  </div>
+                </div>
+                <div class="legend-symbol-row">
+                  <span class="symbol-track"></span>
+                  <div>
+                    <strong>Observed Trajectory / Track</strong>
+                    <small>Sequential timestamped coordinates & movement vector</small>
+                  </div>
+                </div>
+                <small class="legend-note">Calculated with great-circle spherical Haversine geometry. Forecast paths are model outputs.</small>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: AI WEATHER ANOMALY DETECTION -->
+        <!-- ========================================== -->
+        <section class="view" id="view-detection">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>SCIKIT-LEARN ISOLATION FOREST & MULTIVARIATE MODEL</span>
+              </div>
+              <h1>AI Anomaly Detection Engine<span class="cyan-dot">.</span></h1>
+              <p>Evaluates atmospheric vectors against 7-day local historical baseline with transparent feature contribution.</p>
+            </div>
+          </div>
+
+          <div class="detection-split-layout">
+            
+            <!-- Left: Analysis Input Panel -->
+            <div class="dash-card detection-input-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">LOCATION & PARAMETERS</span>
+                  <h2>Target Analysis Area</h2>
+                </div>
+              </div>
+
+              <form id="detect-form">
+                <div class="input-form-group">
+                  <label for="detect-location">CITY, REGION, OR LAT, LON</label>
+                  <div class="detect-search-input-box">
+                    <input type="text" id="detect-location" value="London" placeholder="e.g. Miami, Tokyo, Chennai or 25.76, -80.19" required>
+                    <button type="button" class="btn-locate-me" id="locate-me" title="Use My Current Device Location">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                    </button>
+                  </div>
+                  <div class="suggestions-container" id="location-suggestions"></div>
+                  <div class="selected-target-pill" id="selected-location">London, United Kingdom · 51.5072, -0.1276</div>
+                </div>
+
+                <div class="benchmark-scenario-box">
+                  <label>OR LOAD VERIFIED BENCHMARK SCENARIO:</label>
+                  <div class="scenario-buttons-row">
+                    <button type="button" class="scenario-btn" data-scenario="cyclone">Cyclone Eye (954 hPa, 135 km/h)</button>
+                    <button type="button" class="scenario-btn" data-scenario="deluge">Torrential Rain (65 mm/h)</button>
+                    <button type="button" class="scenario-btn" data-scenario="heatwave">Extreme Heat (48.6 °C)</button>
+                  </div>
+                </div>
+
+                <button type="submit" class="primary-cyan-btn full-width" id="run-detection">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>Execute Anomaly Detection</span>
+                </button>
+              </form>
+
+              <!-- Architecture Pipeline Description -->
+              <div class="engine-specs-box">
+                <h4>ANOMALY DETECTION PIPELINE</h4>
+                <div class="spec-row">
+                  <span>Algorithm:</span>
+                  <strong>Scikit-Learn IsolationForest (120 trees)</strong>
+                </div>
+                <div class="spec-row">
+                  <span>Preprocessing:</span>
+                  <strong>StandardScaler & Median Imputation</strong>
+                </div>
+                <div class="spec-row">
+                  <span>Baseline:</span>
+                  <strong>168 Hourly Historical Observations (Open-Meteo)</strong>
+                </div>
+                <div class="spec-row">
+                  <span>Status:</span>
+                  <strong class="cyan-text" id="model-method">Ready for evaluation</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Detection Results Panel -->
+            <div class="dash-card detection-output-card" id="detection-result">
+              <div class="empty-state-box tall">
+                <svg viewBox="0 0 24 24" width="48" height="48" stroke="#00e5ff" stroke-width="1.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <h3>Awaiting Analysis Execution</h3>
+                <p>Select a location or test scenario on the left and click "Execute Anomaly Detection". The engine will retrieve current observations and historical baselines to compute anomaly scores and XAI contributions.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: EVENT TRACKING & MOVEMENT -->
+        <!-- ========================================== -->
+        <section class="view" id="view-tracking">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>LONGITUDINAL EVENT TRACKING & TRAJECTORY COMPUTATION</span>
+              </div>
+              <h1>Extreme Weather Event Tracking<span class="cyan-dot">.</span></h1>
+              <p>Track persistent weather events over time, inspect intensity trends, and calculate forward speed and bearing.</p>
+            </div>
+
+            <div class="tracking-action-bar">
+              <a class="glass-pill-btn" href="/api/events.csv" download>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export Events CSV</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tracking-layout-grid">
+            
+            <!-- Left: Event Registry Selector -->
+            <div class="dash-card tracking-list-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">EVENT DIRECTORY</span>
+                  <h2>Registered Hazards</h2>
+                </div>
+              </div>
+
+              <!-- Filter Tabs in Event Tracking -->
+              <div class="tracking-filter-row">
+                <select id="tracking-cat-filter">
+                  <option value="">All Categories</option>
+                  <option value="Tropical Cyclone / Deep Depression">Cyclones & Depressions</option>
+                  <option value="Extreme precipitation">Heavy Rain & Deluge</option>
+                  <option value="Gale / Storm winds">Gale & Storm Winds</option>
+                  <option value="Heatwave / cold wave">Heatwaves & Cold Snaps</option>
+                </select>
+              </div>
+
+              <div class="event-registry-list" id="tracking-event-list">
+                <div class="empty-state-box">
+                  <p>No events recorded yet. Run a detection analysis to log detected anomalies.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Detailed Event Inspector -->
+            <div class="dash-card tracking-inspector-card" id="tracking-detail">
+              <div class="empty-state-box tall">
+                <svg viewBox="0 0 24 24" width="44" height="44" stroke="#00e5ff" stroke-width="1.5" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <h3>No Event Selected</h3>
+                <p>Choose any registered event from the list on the left to inspect its trajectory, calculated forward speed, intensity history, and forecast projection.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: FORECAST & TRENDS -->
+        <!-- ========================================== -->
+        <section class="view" id="view-forecast">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>OPEN-METEO NUMERICAL WEATHER PREDICTION</span>
+              </div>
+              <h1>Forecast & Meteorological Trends<span class="cyan-dot">.</span></h1>
+              <p>72-hour detailed hourly forecast curves and 7-day outlook. Forecast values are clearly labeled model projections.</p>
+            </div>
+          </div>
+
+          <!-- Forecast Location Bar -->
+          <div class="forecast-search-toolbar">
+            <div class="forecast-loc-tag">
+              <span>ACTIVE FORECAST REGION:</span>
+              <strong id="forecast-location-name">London, United Kingdom</strong>
+            </div>
+            <div class="forecast-range-toggle">
+              <button class="fc-range-btn active" data-fc-days="3">3-Day Detailed</button>
+              <button class="fc-range-btn" data-fc-days="7">7-Day Extended</button>
+            </div>
+          </div>
+
+          <!-- Multi-Variable Forecast Charts Grid -->
+          <div class="forecast-charts-grid">
+            
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">TEMPERATURE & DEWPOINT</span>
+                  <h3>Thermal Curve (°C)</h3>
+                </div>
+              </div>
+              <div class="chart-box-large">
+                <canvas id="fc-temp-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">PRECIPITATION & RISK</span>
+                  <h3>Hourly Rainfall (mm) & Probability (%)</h3>
+                </div>
+              </div>
+              <div class="chart-box-large">
+                <canvas id="fc-rain-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">WIND VELOCITY</span>
+                  <h3>Sustained Winds & Gusts (km/h)</h3>
+                </div>
+              </div>
+              <div class="chart-box-large">
+                <canvas id="fc-wind-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">BAROMETRIC PRESSURE</span>
+                  <h3>Surface Atmospheric Pressure (hPa)</h3>
+                </div>
+              </div>
+              <div class="chart-box-large">
+                <canvas id="fc-pressure-chart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 7-Day Outlook Cards Strip -->
+          <div class="dash-card extended-outlook-card">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-kicker">7-DAY EXTENDED OUTLOOK</span>
+                <h3>Daily Weather Extremes & Precipitation Totals</h3>
+              </div>
+            </div>
+            <div class="daily-forecast-cards" id="daily-forecast-container">
+              <div class="loading-text">Loading daily forecast data...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: HISTORICAL ANALYSIS -->
+        <!-- ========================================== -->
+        <section class="view" id="view-history">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>OPEN-METEO HISTORICAL ARCHIVE</span>
+              </div>
+              <h1>Historical Weather Archive Analysis<span class="cyan-dot">.</span></h1>
+              <p>Compare observed historical records against seasonal norms up to 90 days in the past.</p>
+            </div>
+          </div>
+
+          <!-- History Controls Panel -->
+          <div class="dash-card history-controls-card">
+            <form id="history-form" class="history-form-grid">
+              <div class="form-group">
+                <label for="history-location">LOCATION</label>
+                <input type="text" id="history-location" value="London" placeholder="City or coords..." required>
+              </div>
+              <div class="form-group">
+                <label for="history-start">START DATE</label>
+                <input type="date" id="history-start" required>
+              </div>
+              <div class="form-group">
+                <label for="history-end">END DATE</label>
+                <input type="date" id="history-end" required>
+              </div>
+              <div class="form-group btn-group">
+                <button type="submit" class="primary-cyan-btn" id="load-history-btn">Load Historical Archive</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Archive Summary KPI row -->
+          <div class="history-kpis-row" id="history-summary">
+            <div class="empty-state-box full-width">
+              <p>Specify a location and date range above to query the Open-Meteo Historical Archive.</p>
+            </div>
+          </div>
+
+          <!-- Historical Chart Panel -->
+          <div class="dash-card history-chart-card">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-kicker">ARCHIVED TIME-SERIES</span>
+                <h2>Historical Observations vs Baseline Envelope</h2>
+              </div>
+              <div class="history-var-select">
+                <select id="history-variable" title="Historical Variable">
+                  <option value="temperature_2m">Temperature (°C)</option>
+                  <option value="precipitation">Precipitation (mm)</option>
+                  <option value="wind_speed_10m">Wind Speed (km/h)</option>
+                  <option value="surface_pressure">Surface Pressure (hPa)</option>
+                </select>
+              </div>
+            </div>
+            <div class="history-chart-wrap">
+              <canvas id="history-chart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: ALERTS & SAFETY PRECAUTIONS -->
+        <!-- ========================================== -->
+        <section class="view" id="view-alerts">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>METEOROLOGICAL THRESHOLDS & PUBLIC SAFETY</span>
+              </div>
+              <h1>Extreme Weather Alerts & Safety Center<span class="cyan-dot">.</span></h1>
+              <p>Review active anomaly warnings, set custom screening rules, and view recommended safety protocols.</p>
+            </div>
+
+            <button class="glass-pill-btn" id="request-notifications">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span>Enable Browser Alerts</span>
+            </button>
+          </div>
+
+          <div class="alerts-layout-split">
+            
+            <!-- Left: Active Detected Alerts Feed -->
+            <div class="dash-card alerts-feed-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">DETECTED ANOMALIES</span>
+                  <h2>Active Hazard Advisories</h2>
+                </div>
+                <button class="glass-pill-btn" id="alerts-refresh">Refresh ↻</button>
+              </div>
+              <div class="alerts-feed-list" id="all-alerts">
+                <div class="empty-state-box">
+                  <p>No active anomalies currently logged. Run a location analysis to screen for severe departures.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Configurable Thresholds & Safety Guidance -->
+            <div class="dash-card threshold-config-card">
+              <div class="dash-card-header">
+                <div>
+                  <span class="dash-card-kicker">AI SCREENING RULES</span>
+                  <h2>Configurable Alert Cutoffs</h2>
+                </div>
+              </div>
+
+              <form id="threshold-form" class="thresholds-form-box">
+                <div class="thresh-row">
+                  <label for="heat_watch_c">Heat Watch Trigger (°C):</label>
+                  <input type="number" id="heat_watch_c" name="heat_watch_c" min="25" max="45" value="35">
+                </div>
+                <div class="thresh-row">
+                  <label for="rain_warning_mm">Rain Warning Trigger (mm / hr):</label>
+                  <input type="number" id="rain_warning_mm" name="rain_warning_mm" min="1" max="100" value="20">
+                </div>
+                <div class="thresh-row">
+                  <label for="wind_watch_kmh">Wind Watch Trigger (km / h):</label>
+                  <input type="number" id="wind_watch_kmh" name="wind_watch_kmh" min="10" max="150" value="50">
+                </div>
+                <button type="submit" class="primary-cyan-btn">Save Screening Rules</button>
+              </form>
+
+              <!-- Severe Baseline Rules -->
+              <div class="fixed-rules-summary">
+                <h4>SEVERE METEOROLOGICAL THRESHOLDS</h4>
+                <div class="rule-item"><span>Severe Heat:</span> <strong>≥ 40 °C</strong></div>
+                <div class="rule-item"><span>Severe Cold:</span> <strong>≤ -20 °C</strong></div>
+                <div class="rule-item"><span>Extreme Deluge:</span> <strong>≥ 50 mm/h</strong></div>
+                <div class="rule-item"><span>Gale / Storm Force:</span> <strong>≥ 75 – 100 km/h</strong></div>
+                <div class="rule-item"><span>Cyclonic Low Pressure:</span> <strong>≤ 980 hPa</strong></div>
+              </div>
+
+              <div class="safety-advisory-banner">
+                <strong>General Safety Precaution:</strong>
+                <p>During severe weather events, avoid traversing flooded roads, secure lightweight outdoor fixtures, stay indoors away from windows, and monitor official municipal directives.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: ABOUT & SYSTEM TRANSPARENCY -->
+        <!-- ========================================== -->
+        <section class="view" id="view-about">
+          
+          <div class="view-header-bar">
+            <div>
+              <div class="hero-tag">
+                <span class="live-dot-pulse"></span>
+                <span>SYSTEM ARCHITECTURE & METHODOLOGY</span>
+              </div>
+              <h1>About WeatherGuard AI<span class="cyan-dot">.</span></h1>
+              <p>Transparent architectural documentation, machine learning models, and data provenance.</p>
+            </div>
+          </div>
+
+          <div class="about-cards-grid">
+            
+            <div class="dash-card about-card highlight">
+              <span class="dash-card-kicker">MISSION & PURPOSE</span>
+              <h2>Detecting the Anomalous. Tracking the Extremes.</h2>
+              <p>WeatherGuard AI provides automated screening and real-time tracking of extreme weather phenomena including tropical cyclones, flash-flood deluges, gale-force winds, intense barometric depressions, and heatwaves.</p>
+              <p>By coupling real-time Open-Meteo observations with Scikit-learn unsupervised machine learning and Haversine spherical tracking, WeatherGuard AI flags atmospheric departures before standard warnings take effect.</p>
+            </div>
+
+            <div class="dash-card about-card">
+              <span class="dash-card-kicker">AI/ML ARCHITECTURE</span>
+              <h2>Isolation Forest + Explainable AI (XAI)</h2>
+              <p>When sufficient historical data (at least 24 hours, typically 168 hours) is available, missing data is imputed with historical medians and normalized using StandardScaler. An Isolation Forest (120 estimators, 5% contamination) isolates multidimensional outliers.</p>
+              <p>Explainable AI feature contributions are calculated using Z-scores and relative percentiles so operators immediately understand which physical variables (temperature, wind, pressure, rainfall) triggered the alert.</p>
+            </div>
+
+            <div class="dash-card about-card">
+              <span class="dash-card-kicker">DATA SOURCES & APIS</span>
+              <h2>Open-Meteo Public Meteorological APIs</h2>
+              <p>The system leverages Open-Meteo's open-access APIs: Forecast API, Historical Weather Archive API, and Geocoding API. Map tiles are provided by OpenStreetMap contributors. Charts are powered by Chart.js.</p>
+              <p>All data is fetched transparently with no secret keys required. If an API request fails, the application informs the user cleanly without substituting fabricated data.</p>
+            </div>
+
+            <div class="dash-card about-card">
+              <span class="dash-card-kicker">TRACKING & GEOMETRY</span>
+              <h2>Haversine Movement Vector Mathematics</h2>
+              <p>Geographic movement direction and forward speed are calculated between successive timestamped coordinates using great-circle spherical trigonometry (Haversine formula). Stationary readings are identified explicitly.</p>
+              <p>Observations, forecast projections, and AI-estimated movements are strictly distinguished to avoid presenting unverified predictions as real observations.</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-notification" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- WeatherGuard AI Client Logic -->
+  <script src="script.js"></script>
+  <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Leaflet Map CSS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Your JavaScript -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+/* =====================================================
+   WEATHERGUARD AI — JAVASCRIPT
+   Live Weather | Extreme Weather Detection | Forecast
+   ===================================================== */
+
+(() => {
+  "use strict";
+
+  const $ = (selector) => document.querySelector(selector);
+
+  const state = {
+    location: {
+      name: "Coimbatore, Tamil Nadu",
+      latitude: 11.0168,
+      longitude: 76.9558
+    },
+    weather: null,
+    hourly: null,
+    events: [],
+    maps: {},
+    charts: {},
+    timelineHour: 0,
+    forecastDays: 3
+  };
+
+  const API = {
+    geocode: "https://geocoding-api.open-meteo.com/v1/search",
+    forecast: "https://api.open-meteo.com/v1/forecast"
+  };
+
+  // Display messages
+  function toast(message, type = "info") {
+    const element = $("#toast");
+
+    if (!element) {
+      console.log(message);
+      return;
+    }
+
+    element.textContent = message;
+    element.classList.add("show");
+    element.dataset.type = type;
+
+    clearTimeout(toast.timer);
+
+    toast.timer = setTimeout(() => {
+      element.classList.remove("show");
+    }, 3500);
+  }
+
+  // Update HTML elements safely
+  function setText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function formatNumber(value, digits = 1) {
+    const number = Number(value);
+
+    return Number.isFinite(number)
+      ? number.toFixed(digits)
+      : "—";
+  }
+
+  // Weather description
+  function weatherLabel(code) {
+    const labels = {
+      0: "Clear Sky",
+      1: "Mainly Clear",
+      2: "Partly Cloudy",
+      3: "Overcast",
+      45: "Fog",
+      48: "Dense Fog",
+      51: "Light Drizzle",
+      53: "Drizzle",
+      55: "Heavy Drizzle",
+      61: "Light Rain",
+      63: "Moderate Rain",
+      65: "Heavy Rain",
+      71: "Light Snow",
+      73: "Snow",
+      75: "Heavy Snow",
+      80: "Rain Showers",
+      81: "Moderate Showers",
+      82: "Heavy Showers",
+      95: "Thunderstorm",
+      96: "Thunderstorm with Hail",
+      99: "Severe Thunderstorm"
+    };
+
+    return labels[code] || "Weather Observation";
+  }
+
+  // Search city or latitude,longitude
+  async function geocode(query) {
+    const text = query.trim();
+
+    const coordinates = text.match(
+      /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/
+    );
+
+    if (coordinates) {
+      const latitude = Number(coordinates[1]);
+      const longitude = Number(coordinates[2]);
+
+      if (
+        Math.abs(latitude) > 90 ||
+        Math.abs(longitude) > 180
+      ) {
+        throw new Error("Please enter valid coordinates.");
+      }
+
+      return {
+        name: `${latitude}, ${longitude}`,
+        latitude,
+        longitude
+      };
+    }
+
+    const url =
+      `${API.geocode}?name=${encodeURIComponent(text)}` +
+      "&count=1&language=en&format=json";
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Unable to search for this location.");
+    }
+
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      throw new Error("City not found. Try another city name.");
+    }
+
+    const place = data.results[0];
+
+    return {
+      name: [
+        place.name,
+        place.admin1,
+        place.country
+      ].filter(Boolean).join(", "),
+      latitude: place.latitude,
+      longitude: place.longitude
+    };
+  }
+
+  // Fetch live weather data
+  async function loadWeather(location = state.location) {
+    const parameters = new URLSearchParams({
+      latitude: location.latitude,
+      longitude: location.longitude,
+
+      current: [
+        "temperature_2m",
+        "relative_humidity_2m",
+        "apparent_temperature",
+        "precipitation",
+        "weather_code",
+        "pressure_msl",
+        "surface_pressure",
+        "wind_speed_10m",
+        "wind_direction_10m",
+        "wind_gusts_10m"
+      ].join(","),
+
+      hourly: [
+        "temperature_2m",
+        "relative_humidity_2m",
+        "precipitation_probability",
+        "precipitation",
+        "pressure_msl",
+        "surface_pressure",
+        "wind_speed_10m",
+        "wind_gusts_10m",
+        "weather_code"
+      ].join(","),
+
+      daily: [
+        "weather_code",
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "precipitation_sum",
+        "precipitation_probability_max",
+        "wind_speed_10m_max"
+      ].join(","),
+
+      forecast_days: "7",
+      timezone: "auto"
+    });
+
+    setText("connection-state", "Connecting...");
+    setText("connection-detail", "Fetching weather data");
+
+    try {
+      const response = await fetch(
+        `${API.forecast}?${parameters}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Weather API request failed.");
+      }
+
+      const data = await response.json();
+
+      state.location = location;
+      state.weather = data.current;
+      state.hourly = data.hourly;
+      state.forecast = data;
+
+      renderWeather(data);
+      detectExtremeWeather(data.current);
+      renderForecast(data);
+      renderMaps();
+
+      setText("connection-state", "Weather Data Connected");
+      setText("connection-detail", "Latest available weather observations");
+
+      setText(
+        "last-updated",
+        `Updated ${new Date().toLocaleString()}`
+      );
+
+      setText(
+        "current-coords-pill",
+        `Lat: ${location.latitude.toFixed(3)} · Lon: ${location.longitude.toFixed(3)}`
+      );
+
+      return data;
+
+    } catch (error) {
+      setText("connection-state", "Connection Error");
+      setText("connection-detail", "Check your internet connection");
+
+      toast(error.message, "error");
+      throw error;
+    }
+  }
+
+  // Display current weather
+  function renderWeather(data) {
+    const current = data.current;
+    const hourly = data.hourly;
+
+    setText("current-place", state.location.name);
+
+    setText(
+      "current-coords",
+      `${state.location.latitude.toFixed(4)}°, ${state.location.longitude.toFixed(4)}°`
+    );
+
+    setText(
+      "current-temp",
+      `${formatNumber(current.temperature_2m)}°C`
+    );
+
+    setText(
+      "current-condition",
+      weatherLabel(current.weather_code)
+    );
+
+    setText(
+      "current-feels",
+      `Feels like ${formatNumber(current.apparent_temperature)}°C`
+    );
+
+    setText(
+      "current-rain",
+      `${formatNumber(current.precipitation)} mm`
+    );
+
+    setText(
+      "current-wind",
+      `${formatNumber(current.wind_speed_10m)} km/h`
+    );
+
+    setText(
+      "current-wind-dir",
+      `${formatNumber(current.wind_direction_10m, 0)}° direction`
+    );
+
+    setText(
+      "current-pressure",
+      `${formatNumber(current.surface_pressure)} hPa`
+    );
+
+    setText(
+      "current-pressure-tendency",
+      `Sea-level: ${formatNumber(current.pressure_msl)} hPa`
+    );
+
+    setText(
+      "current-humidity",
+      `${formatNumber(current.relative_humidity_2m, 0)}%`
+    );
+
+    const index = Math.max(
+      0,
+      hourly.time.findIndex(time => time >= current.time)
+    );
+
+    setText(
+      "current-rain-prob",
+      `Probability: ${formatNumber(hourly.precipitation_probability?.[index], 0)}%`
+    );
+
+    // Next six hours
+    const container = $("#forecast-hours");
+
+    if (container) {
+      container.replaceChildren();
+
+      for (
+        let i = index;
+        i < Math.min(index + 6, hourly.time.length);
+        i++
+      ) {
+        const card = document.createElement("div");
+
+        card.className = "mini-hour-item";
+
+        card.innerHTML = `
+          <span>${hourly.time[i].slice(11, 16)}</span>
+          <strong>${formatNumber(hourly.temperature_2m[i])}°C</strong>
+          <small>${formatNumber(hourly.precipitation_probability?.[i], 0)}% rain</small>
+        `;
+
+        container.appendChild(card);
+      }
+    }
+
+    drawOverviewChart("temp");
+  }
+
+  // Detect possible extreme weather using thresholds
+  function classifyWeather(current) {
+    const events = [];
+
+    function addEvent(category, severity, detail) {
+      events.push({
+        id: `${category}-${Date.now()}-${Math.random()}`,
+        category,
+        severity,
+        detail,
+        location: state.location.name,
+        latitude: state.location.latitude,
+        longitude: state.location.longitude,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (current.temperature_2m >= 40) {
+      addEvent(
+        "Extreme Heat",
+        "Severe",
+        `Temperature: ${current.temperature_2m}°C`
+      );
+    } else if (current.temperature_2m >= 35) {
+      addEvent(
+        "High Temperature",
+        "Warning",
+        `Temperature: ${current.temperature_2m}°C`
+      );
+    }
+
+    if (current.temperature_2m <= -20) {
+      addEvent(
+        "Extreme Cold",
+        "Severe",
+        `Temperature: ${current.temperature_2m}°C`
+      );
+    }
+
+    if (current.precipitation >= 50) {
+      addEvent(
+        "Extreme Precipitation",
+        "Severe",
+        `Precipitation: ${current.precipitation} mm`
+      );
+    } else if (current.precipitation >= 20) {
+      addEvent(
+        "Heavy Precipitation",
+        "Warning",
+        `Precipitation: ${current.precipitation} mm`
+      );
+    }
+
+    if (current.wind_speed_10m >= 100) {
+      addEvent(
+        "Storm Winds",
+        "Severe",
+        `Wind speed: ${current.wind_speed_10m} km/h`
+      );
+    } else if (current.wind_speed_10m >= 75) {
+      addEvent(
+        "Strong Winds",
+        "Warning",
+        `Wind speed: ${current.wind_speed_10m} km/h`
+      );
+    }
+
+    if (current.surface_pressure <= 980) {
+      addEvent(
+        "Low Pressure",
+        "Severe",
+        `Pressure: ${current.surface_pressure} hPa`
+      );
+    }
+
+    if ([95, 96, 99].includes(current.weather_code)) {
+      addEvent(
+        "Thunderstorm",
+        "Warning",
+        weatherLabel(current.weather_code)
+      );
+    }
+
+    return events;
+  }
+
+  function detectExtremeWeather(current) {
+    const events = classifyWeather(current);
+
+    state.events = [
+      ...state.events.filter(
+        event => event.location !== state.location.name
+      ),
+      ...events
+    ];
+
+    renderEvents();
+
+    const severeCount = state.events.filter(
+      event => event.severity === "Severe"
+    ).length;
+
+    setText("metric-total", state.events.length);
+    setText("metric-severe", severeCount);
+    setText("metric-active", state.events.length - severeCount);
+    setText("metric-day", state.events.length);
+    setText("nav-event-count", state.events.length);
+    setText("nav-alert-count", severeCount);
+
+    if (events.length > 0) {
+      const top = events[0];
+
+      setText("threat-badge", top.severity.toUpperCase());
+      setText("threat-category", top.category);
+      setText("threat-location", top.location);
+      setText("threat-headline", `${top.category} Detected`);
+      setText("threat-details", top.detail);
+
+      toast(
+        `${events.length} possible weather event(s) flagged.`,
+        "warning"
+      );
+    } else {
+      setText("threat-badge", "MONITORING");
+      setText("threat-category", "No configured threshold crossed");
+      setText("threat-location", state.location.name);
+      setText("threat-headline", "Weather Monitoring Active");
+      setText(
+        "threat-details",
+        "No configured extreme-weather threshold was crossed."
+      );
+    }
+
+    return events;
+  }
+
+  // Display detected events
+  function renderEvents() {
+    const containers = [
+      $("#events-list"),
+      $("#alerts-list"),
+      $("#detection-events")
+    ].filter(Boolean);
+
+    containers.forEach(container => {
+      container.replaceChildren();
+
+      if (state.events.length === 0) {
+        const message = document.createElement("p");
+        message.textContent = "No threshold events currently recorded.";
+        container.appendChild(message);
+        return;
+      }
+
+      state.events.forEach(event => {
+        const card = document.createElement("article");
+        card.className = "event-card";
+
+        const title = document.createElement("h3");
+        title.textContent = event.category;
+
+        const severity = document.createElement("p");
+        severity.textContent = `Severity: ${event.severity}`;
+
+        const detail = document.createElement("p");
+        detail.textContent = event.detail;
+
+        const location = document.createElement("small");
+        location.textContent = event.location;
+
+        card.append(title, severity, detail, location);
+        container.appendChild(card);
+      });
+    });
+  }
+
+  // Chart configuration
+  function chartOptions() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: "index"
+      },
+      plugins: {
+        legend: {
+          display: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 8
+          }
+        }
+      }
+    };
+  }
+
+  function createChart(id, config) {
+    const canvas = document.getElementById(id);
+
+    if (!canvas || typeof Chart === "undefined") {
+      return;
+    }
+
+    if (state.charts[id]) {
+      state.charts[id].destroy();
+    }
+
+    state.charts[id] = new Chart(canvas, config);
+  }
+
+  // Main weather chart
+  function drawOverviewChart(kind = "temp") {
+    if (!state.hourly || typeof Chart === "undefined") {
+      return;
+    }
+
+    const hourly = state.hourly;
+    const start = Math.max(
+      0,
+      hourly.time.findIndex(time => time >= state.weather.time)
+    );
+
+    const end = Math.min(start + 24, hourly.time.length);
+
+    const variables = {
+      temp: {
+        label: "Temperature °C",
+        key: "temperature_2m"
+      },
+      wind: {
+        label: "Wind Speed km/h",
+        key: "wind_speed_10m"
+      },
+      pressure: {
+        label: "Pressure hPa",
+        key: "surface_pressure"
+      },
+      rain: {
+        label: "Precipitation mm",
+        key: "precipitation"
+      }
+    };
+
+    const selected = variables[kind] || variables.temp;
+
+    createChart("overview-chart", {
+      type: "line",
+      data: {
+        labels: hourly.time
+          .slice(start, end)
+          .map(time => time.slice(11, 16)),
+
+        datasets: [{
+          label: selected.label,
+          data: hourly[selected.key].slice(start, end),
+          borderColor: "#00e5ff",
+          backgroundColor: "rgba(0,229,255,0.12)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 2
+        }]
+      },
+      options: chartOptions()
+    });
+  }
+
+  // Seven-day and hourly forecasts
+  function renderForecast(data) {
+    const hourly = data.hourly;
+    const daily = data.daily;
+
+    const labels = hourly.time
+      .slice(0, 72)
+      .map(time => time.slice(5, 16).replace("T", " "));
+
+    function dataset(label, values, color) {
+      return {
+        label,
+        data: values.slice(0, 72),
+        borderColor: color,
+        tension: 0.25,
+        pointRadius: 0
+      };
+    }
+
+    createChart("fc-temp-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          dataset(
+            "Temperature °C",
+            hourly.temperature_2m,
+            "#00e5ff"
+          )
+        ]
+      },
+      options: chartOptions()
+    });
+
+    createChart("fc-rain-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          dataset(
+            "Precipitation mm",
+            hourly.precipitation,
+            "#39a0ff"
+          )
+        ]
+      },
+      options: chartOptions()
+    });
+
+    createChart("fc-wind-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          dataset(
+            "Wind km/h",
+            hourly.wind_speed_10m,
+            "#00d68f"
+          ),
+          dataset(
+            "Wind Gusts km/h",
+            hourly.wind_gusts_10m,
+            "#ff6b81"
+          )
+        ]
+      },
+      options: chartOptions()
+    });
+
+    createChart("fc-pressure-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          dataset(
+            "Pressure hPa",
+            hourly.surface_pressure,
+            "#b38cff"
+          )
+        ]
+      },
+      options: chartOptions()
+    });
+
+    const container = $("#daily-forecast-container");
+
+    if (container) {
+      container.replaceChildren();
+
+      daily.time.forEach((day, index) => {
+        const card = document.createElement("div");
+        card.className = "daily-forecast-item";
+
+        const title = document.createElement("h3");
+        title.textContent = new Date(
+          `${day}T12:00:00`
+        ).toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        });
+
+        const condition = document.createElement("p");
+        condition.textContent = weatherLabel(
+          daily.weather_code[index]
+        );
+
+        const temperature = document.createElement("p");
+        temperature.textContent =
+          `${formatNumber(daily.temperature_2m_max[index])}° / ` +
+          `${formatNumber(daily.temperature_2m_min[index])}°C`;
+
+        const rain = document.createElement("small");
+        rain.textContent =
+          `${formatNumber(daily.precipitation_sum[index])} mm rain`;
+
+        card.append(title, condition, temperature, rain);
+        container.appendChild(card);
+      });
+    }
+  }
+
+  // Leaflet map setup
+  function createMap(id) {
+    const element = document.getElementById(id);
+
+    if (!element || typeof L === "undefined") {
+      return null;
+    }
+
+    if (state.maps[id]) {
+      return state.maps[id];
+    }
+
+    const map = L.map(element).setView(
+      [state.location.latitude, state.location.longitude],
+      6
+    );
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 18
+      }
+    ).addTo(map);
+
+    state.maps[id] = map;
+
+    return map;
+  }
+
+  function renderMaps() {
+    ["map-preview", "full-map"].forEach(id => {
+      const map = createMap(id);
+
+      if (!map) {
+        return;
+      }
+
+      map.setView(
+        [state.location.latitude, state.location.longitude],
+        6
+      );
+
+      if (state.maps[`${id}-markers`]) {
+        state.maps[`${id}-markers`].clearLayers();
+      }
+
+      const markers = L.layerGroup().addTo(map);
+      state.maps[`${id}-markers`] = markers;
+
+      L.marker([
+        state.location.latitude,
+        state.location.longitude
+      ])
+        .bindPopup(`<b>${state.location.name}</b>`)
+        .addTo(markers);
+
+      state.events.forEach(event => {
+        const marker = L.circleMarker(
+          [event.latitude, event.longitude],
+          {
+            radius: 8,
+            color: event.severity === "Severe"
+              ? "#ff3333"
+              : "#ffb020"
+          }
+        );
+
+        marker.bindPopup(
+          `<b>${event.category}</b><br>${event.detail}`
+        );
+
+        marker.addTo(markers);
+      });
+
+      setTimeout(() => map.invalidateSize(), 150);
+    });
+  }
+
+  // Navigation between dashboard sections
+  function showView(viewName) {
+    document.querySelectorAll("[data-view]").forEach(view => {
+      view.hidden = view.dataset.view !== viewName;
+    });
+
+    document.querySelectorAll("[data-go]").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.go === viewName
+      );
+    });
+
+    Object.values(state.maps).forEach(map => {
+      if (map && typeof map.invalidateSize === "function") {
+        setTimeout(() => map.invalidateSize(), 100);
+      }
+    });
+  }
+
+  function initNavigation() {
+    document.querySelectorAll("[data-go]").forEach(button => {
+      button.addEventListener("click", () => {
+        showView(button.dataset.go);
+      });
+    });
+  }
+
+  // Search actions
+  async function searchAndLoad(query) {
+    if (!query || !query.trim()) {
+      toast("Enter a city name or coordinates.");
+      return;
+    }
+
+    try {
+      const location = await geocode(query);
+      await loadWeather(location);
+      toast(`Weather loaded for ${location.name}`);
+    } catch (error) {
+      toast(error.message, "error");
+    }
+  }
+
+  function initSearch() {
+    const searchForms = [
+      $("#location-search-form"),
+      $("#search-form"),
+      $("#map-search-form")
+    ].filter(Boolean);
+
+    searchForms.forEach(form => {
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const input = form.querySelector(
+          'input[type="text"], input:not([type])'
+        );
+
+        if (input) {
+          await searchAndLoad(input.value);
+        }
+      });
+    });
+
+    const searchButtons = [
+      $("#location-search-btn"),
+      $("#map-search-btn")
+    ].filter(Boolean);
+
+    searchButtons.forEach(button => {
+      button.addEventListener("click", async () => {
+        const input = $("#location-search") ||
+          $("#map-search") ||
+          $("#city-search");
+
+        if (input) {
+          await searchAndLoad(input.value);
+        }
+      });
+    });
+
+    $("#refresh-weather")?.addEventListener("click", () => {
+      loadWeather().catch(() => {});
+    });
+
+    $("#sync-btn")?.addEventListener("click", () => {
+      loadWeather().catch(() => {});
+    });
+  }
+
+  // Detection page and demonstration scenarios
+  function initDetection() {
+    $("#detect-form")?.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const input = $("#detect-location");
+      const query = input?.value || state.location.name;
+
+      const button = $("#run-detection");
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Analyzing...";
+      }
+
+      try {
+        const location = await geocode(query);
+        const data = await loadWeather(location);
+        const events = classifyWeather(data.current);
+
+        const result = $("#detection-result");
+
+        if (result) {
+          result.replaceChildren();
+
+          const heading = document.createElement("h3");
+          heading.textContent = "Weather Screening Results";
+
+          const paragraph = document.createElement("p");
+          paragraph.textContent = events.length
+            ? events.map(event =>
+                `${event.category}: ${event.severity}`
+              ).join(" | ")
+            : "No configured threshold was crossed.";
+
+          const note = document.createElement("small");
+          note.textContent =
+            "This is threshold-based screening, not a trained ML prediction or an official weather warning.";
+
+          result.append(heading, paragraph, note);
+        }
+
+        showView("detection");
+
+      } catch (error) {
+        toast(error.message, "error");
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Execute Anomaly Detection";
+        }
+      }
+    });
+
+    document.querySelectorAll("[data-scenario]").forEach(button => {
+      button.addEventListener("click", () => {
+        const scenarios = {
+          cyclone: {
+            temperature_2m: 28,
+            precipitation: 12,
+            wind_speed_10m: 135,
+            surface_pressure: 954,
+            weather_code: 95
+          },
+          deluge: {
+            temperature_2m: 25,
+            precipitation: 65,
+            wind_speed_10m: 20,
+            surface_pressure: 1000,
+            weather_code: 65
+          },
+          heatwave: {
+            temperature_2m: 48,
+            precipitation: 0,
+            wind_speed_10m: 10,
+            surface_pressure: 1008,
+            weather_code: 0
+          }
+        };
+
+        const sample = scenarios[button.dataset.scenario];
+
+        if (!sample) {
+          return;
+        }
+
+        const events = classifyWeather(sample);
+        const result = $("#detection-result");
+
+        if (result) {
+          result.textContent =
+            `Demonstration scenario: ${button.textContent}. ` +
+            (events.length
+              ? events.map(event => event.category).join(", ")
+              : "No configured threshold crossed.") +
+            " Sample data only; not a live event.";
+        }
+
+        toast("Demonstration scenario loaded; this is sample data.");
+      });
+    });
+
+    $("#locate-me")?.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        toast("Location is not supported by this browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const input = $("#detect-location");
+
+          if (input) {
+            input.value =
+              `${position.coords.latitude},${position.coords.longitude}`;
+          }
+        },
+        () => toast("Location permission unavailable.", "warning")
+      );
+    });
+  }
+
+  // Chart selection buttons
+  function initCharts() {
+    document.querySelectorAll(".chart-tab[data-dash-chart]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".chart-tab")
+            .forEach(tab => tab.classList.remove("active"));
+
+          button.classList.add("active");
+
+          drawOverviewChart(button.dataset.dashChart);
+        });
+      });
+  }
+
+  // Map timeline controls
+  function initTimeline() {
+    const slider = $("#map-timeline-slider");
+
+    function update() {
+      const value = Number(slider?.value ?? 24);
+
+      state.timelineHour = value - 24;
+
+      setText(
+        "map-timeline-time",
+        state.timelineHour === 0
+          ? "Current observation"
+          : `${state.timelineHour > 0 ? "+" : ""}${state.timelineHour}h`
+      );
+    }
+
+    slider?.addEventListener("input", update);
+
+    $("#timeline-prev-btn")?.addEventListener("click", () => {
+      if (slider) {
+        slider.value = Math.max(
+          Number(slider.min || 0),
+          Number(slider.value) - 1
+        );
+      }
+
+      update();
+    });
+
+    $("#timeline-next-btn")?.addEventListener("click", () => {
+      if (slider) {
+        slider.value = Math.min(
+          Number(slider.max || 48),
+          Number(slider.value) + 1
+        );
+      }
+
+      update();
+    });
+
+    update();
+  }
+
+  // Extra dashboard actions
+  function initActions() {
+    $("#alerts-refresh")?.addEventListener("click", renderEvents);
+
+    $("#map-add-benchmark")?.addEventListener("click", () => {
+      toast("Use live weather data for real event screening.");
+    });
+
+    $("#seed-sample-btn")?.addEventListener("click", () => {
+      toast("Choose a demonstration scenario in the detection section.");
+    });
+
+    $("#request-notifications")?.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        toast("Notifications are not supported by this browser.");
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+
+      toast(
+        permission === "granted"
+          ? "Notification permission enabled."
+          : "Notification permission not granted."
+      );
+    });
+
+    $("#threshold-form")?.addEventListener("submit", event => {
+      event.preventDefault();
+      toast("Default screening thresholds are active.");
+    });
+
+    $("#history-form")?.addEventListener("submit", event => {
+      event.preventDefault();
+      toast("Historical archive analysis is not implemented in this version.");
+    });
+
+    document.querySelectorAll(".fc-range-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".fc-range-btn")
+          .forEach(item => item.classList.remove("active"));
+
+        button.classList.add("active");
+        state.forecastDays = Number(button.dataset.fcDays || 3);
+
+        toast(`${state.forecastDays}-day forecast selected.`);
+      });
+    });
+  }
+
+  // Initialize application
+  async function init() {
+    initNavigation();
+    initSearch();
+    initCharts();
+    initDetection();
+    initTimeline();
+    initActions();
+
+    setInterval(() => {
+      setText("clock", new Date().toLocaleTimeString());
+    }, 1000);
+
+    setTimeout(renderMaps, 300);
+
+    try {
+      await loadWeather();
+    } catch (error) {
+      console.error("Initial weather load failed:", error);
+    }
+
+    // Available for debugging from the browser console
+    window.WeatherGuardAI = {
+      refresh: () => loadWeather(),
+      search: searchAndLoad,
+      getState: () => ({
+        location: state.location,
+        weather: state.weather,
+        events: [...state.events]
+      })
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+
+})();
+</body>
+</html>
